@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontera — Brewery Recipes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #191919;
+    color: #e2e2e2;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    padding: 48px 48px 24px;
+    border-bottom: 1px solid #2e2e2e;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .page-subtitle {
+    color: #737373;
+    font-size: 13px;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 48px;
+    border-bottom: 1px solid #2e2e2e;
+  }
+
+  .toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #a0a0a0;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .toolbar-btn:hover { background: #252525; color: #e2e2e2; }
+
+  .toolbar-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  .search-wrap {
+    position: relative;
+    margin-left: auto;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 13px;
+    height: 13px;
+    color: #555;
+    pointer-events: none;
+  }
+
+  .search-input {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #e2e2e2;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 5px 10px 5px 30px;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .search-input::placeholder { color: #555; }
+  .search-input:focus { border-color: #555; }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    padding: 0 48px 48px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+  }
+
+  thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+    color: #737373;
+    border-bottom: 1px solid #2e2e2e;
+    white-space: nowrap;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  thead th:hover { color: #bbb; }
+
+  thead th .th-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  thead th svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  tbody tr {
+    border-bottom: 1px solid #242424;
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: #1f1f1f; }
+
+  tbody td {
+    padding: 9px 12px;
+    vertical-align: middle;
+    color: #d4d4d4;
+    font-size: 13px;
+  }
+
+  /* Recipe name cell */
+  .recipe-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #e8e8e8;
+    white-space: nowrap;
+  }
+
+  .recipe-cell svg {
+    width: 14px;
+    height: 14px;
+    color: #555;
+    flex-shrink: 0;
+  }
+
+  /* Checkbox */
+  .check-cell {
+    text-align: center;
+  }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1.5px solid #444;
+    background: transparent;
+    flex-shrink: 0;
+  }
+
+  .check.checked {
+    background: #2e88ff;
+    border-color: #2e88ff;
+  }
+
+  .check.checked svg {
+    width: 10px;
+    height: 10px;
+    color: #fff;
+  }
+
+  /* Ageing badge */
+  .ageing {
+    color: #a0a0a0;
+  }
+
+  .ageing.none {
+    color: #555;
+    font-style: italic;
+  }
+
+  /* Empty state */
+  .empty-row td {
+    text-align: center;
+    padding: 48px;
+    color: #555;
+    font-style: italic;
+  }
+
+  /* Filter pills */
+  .filter-pills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 48px 12px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid #333;
+    background: transparent;
+    color: #737373;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .pill:hover { border-color: #555; color: #bbb; }
+  .pill.active { background: #2e88ff; border-color: #2e88ff; color: #fff; }
+
+  /* Count */
+  .row-count {
+    padding: 10px 48px 4px;
+    font-size: 11px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">🍺 Frontera Brewery Recipes</div>
+  <div class="page-subtitle">BreweryX plugin — all recipes available on the server</div>
+</div>
+
+<div class="toolbar">
+  <!-- Filter icon -->
+  <button class="toolbar-btn" onclick="toggleDistillFilter()">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+    Filter
+  </button>
+  <div class="search-wrap">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M11 11l3 3"/></svg>
+    <input class="search-input" type="text" placeholder="Search recipes…" id="searchInput" oninput="applyFilters()">
+  </div>
+</div>
+
+<div class="filter-pills" id="filterPills">
+  <button class="pill active" data-filter="all" onclick="setFilter('all', this)">All</button>
+  <button class="pill" data-filter="distill" onclick="setFilter('distill', this)">Requires Distilling</button>
+  <button class="pill" data-filter="nodistill" onclick="setFilter('nodistill', this)">No Distilling</button>
+  <button class="pill" data-filter="noageing" onclick="setFilter('noageing', this)">No Ageing</button>
+</div>
+
+<div class="row-count" id="rowCount"></div>
+
+<div class="table-wrap">
+  <table id="recipeTable">
+    <thead>
+      <tr>
+        <th onclick="sortTable('name')">
+          <div class="th-inner">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>
+            Recipe
+          </div>
+        </th>
+        <th onclick="sortTable('ingredients')">
+          <div class="th-inner">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M4 6l4-4 4 4"/><path d="M5 10h6"/></svg>
+            Ingredients
+          </div>
+        </th>
+        <th onclick="sortTable('boiling')">
+          <div class="th-inner">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 1.5"/></svg>
+            Boiling Time
+          </div>
+        </th>
+        <th>
+          <div class="th-inner">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2.5 2.5L11 5"/></svg>
+            Distilling
+          </div>
+        </th>
+        <th onclick="sortTable('ageing')">
+          <div class="th-inner">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="8" cy="9" rx="5" ry="4"/><path d="M3 9V6a5 4 0 0 1 10 0v3"/></svg>
+            Ageing / Wood
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+const recipes = [
+  { name: "Beer",           ingredients: "6 Wheat",                              boiling: "8 Minutes",         distill: false, ageing: "3 Years / Any" },
+  { name: "Wheatbeer",      ingredients: "3 Wheat",                              boiling: "8 Minutes",         distill: false, ageing: "2 Years / Birch" },
+  { name: "Darkbeer",       ingredients: "6 Wheat",                              boiling: "8 Minutes",         distill: false, ageing: "3× Beer / Dark Oak" },
+  { name: "Red Wine",       ingredients: "5 Sweet Berries",                      boiling: "5 Minutes",         distill: false, ageing: "Very Long / Any" },
+  { name: "Mead",           ingredients: "6 Sugar Cane",                         boiling: "3 Minutes",         distill: false, ageing: "4 Years / Oak" },
+  { name: "Apple Mead",     ingredients: "6 Sugar Cane, 2 Apples",              boiling: "Similar to Mead",   distill: false, ageing: "4 Years / Oak" },
+  { name: "Apple Cider",    ingredients: "14 Apples",                            boiling: "7/8 Minutes",       distill: false, ageing: "3 Years / Any" },
+  { name: "Apple Liquor",   ingredients: "12 Apples",                            boiling: "Long",              distill: true,  ageing: "6 Years / Acacia" },
+  { name: "Whiskey",        ingredients: "10 Wheat",                             boiling: "1 min. per Wheat",  distill: true,  ageing: "Very Long / Dark Oak" },
+  { name: "Rum",            ingredients: "18 Sugar Cane",                        boiling: "Short",             distill: true,  ageing: "Long / Oak" },
+  { name: "Vodka",          ingredients: "10 Potatoes",                          boiling: "Long",              distill: true,  ageing: "No" },
+  { name: "Mushroom Vodka", ingredients: "10 Potatoes, 3 Red Mushroom",         boiling: "Very Long",         distill: true,  ageing: "No" },
+  { name: "Gin",            ingredients: "9 Wheat, 6 Corn Flower, 1 Apple",     boiling: "Short",             distill: true,  ageing: "No" },
+  { name: "Tequila",        ingredients: "8 Cactus",                             boiling: "Long",              distill: true,  ageing: "Long / Birch" },
+  { name: "Absinthe",       ingredients: "15 Grass",                             boiling: "Short",             distill: true,  ageing: "No" },
+  { name: "Green Absinthe", ingredients: "17 Grass, 2 Poisonous Potato",        boiling: "Normal",            distill: true,  ageing: "No" },
+  { name: "Potato Soup",    ingredients: "5 Potato, 3 Grass",                   boiling: "Short",             distill: false, ageing: "No" },
+  { name: "Coffee",         ingredients: "12 Cocoa Beans, 2 Milk Buckets",      boiling: "Short",             distill: false, ageing: "No" },
+  { name: "Eggnog",         ingredients: "5 Eggs, 2 Sugar, 1 Milkbucket",       boiling: "Short",             distill: false, ageing: "Short / Any" },
+];
+
+let activeFilter = 'all';
+let sortKey = null;
+let sortDir = 1;
+
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+let distillFilterOn = false;
+function toggleDistillFilter() {
+  // Just show the filter pills area — already visible
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  let list = recipes.filter(r => {
+    if (q && !r.name.toLowerCase().includes(q) && !r.ingredients.toLowerCase().includes(q)) return false;
+    if (activeFilter === 'distill' && !r.distill) return false;
+    if (activeFilter === 'nodistill' && r.distill) return false;
+    if (activeFilter === 'noageing' && r.ageing !== 'No') return false;
+    return true;
+  });
+
+  if (sortKey) {
+    list = list.slice().sort((a, b) => {
+      let av = a[sortKey] ?? '', bv = b[sortKey] ?? '';
+      if (typeof av === 'boolean') return (av === bv ? 0 : av ? -1 : 1) * sortDir;
+      return av.localeCompare(bv) * sortDir;
+    });
+  }
+
+  renderTable(list);
+}
+
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  applyFilters();
+}
+
+function renderTable(list) {
+  const tbody = document.getElementById('tableBody');
+  document.getElementById('rowCount').textContent = `${list.length} recipe${list.length !== 1 ? 's' : ''}`;
+
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No recipes match your search.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => `
+    <tr>
+      <td>
+        <div class="recipe-cell">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>
+          ${r.name}
+        </div>
+      </td>
+      <td>${r.ingredients}</td>
+      <td>${r.boiling}</td>
+      <td class="check-cell">
+        <div class="check ${r.distill ? 'checked' : ''}">
+          ${r.distill ? `<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 5l2.5 2.5L8.5 2"/></svg>` : ''}
+        </div>
+      </td>
+      <td class="ageing ${r.ageing === 'No' ? 'none' : ''}">${r.ageing}</td>
+    </tr>
+  `).join('');
+}
+
+applyFilters();
+</script>
+</body>
+</html>
